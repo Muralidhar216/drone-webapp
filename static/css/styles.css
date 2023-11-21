@@ -14,3 +14,8 @@
     font-size: large;
     font-weight: bolder;
 }
+.yaw_moment{
+    padding-top: 5px;
+    display:flex;
+    justify-content:center;
+}
