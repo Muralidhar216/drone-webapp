@@ -74,3 +74,25 @@ function RTL() {
         console.error('Error:', error);
     });
 }
+
+
+function yaw(event) {
+    event.preventDefault();  // Prevent the form from submitting and page reload
+
+    const yaw = document.getElementById('yaw').value;
+    console.log(yaw);
+    fetch('/yaw', {
+        method: 'POST',
+        body: JSON.stringify({ yaw: yaw }),
+        headers: {
+            'Content-Type': 'application/json', // Set the Content-Type header
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}

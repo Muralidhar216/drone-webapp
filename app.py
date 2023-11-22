@@ -147,6 +147,7 @@ from dronekit import LocationGlobalRelative, VehicleMode
 from dronekit import connect as dronekit_connect
 from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
+from pymavlink import mavutil
 
 app = Flask(__name__)
 app.config['SECRET_KEY']="SapientGeeks"
@@ -174,6 +175,40 @@ def handle_connect():
     # socketio.emit('parameters', {'data': 0})
     # while vehicle is not None:
     # get_parameters()
+
+
+def condition_yaw_at_current_location(heading, relative=False):
+    global vehicle
+    if relative:
+        is_relative = 1  # yaw relative to the direction of travel
+    else:
+        is_relative = 0  # yaw is an absolute angle
+
+    # Get current position to maintain the same altitude
+    current_location = vehicle.location.global_relative_frame
+    current_altitude = current_location.alt
+
+    # create the CONDITION_YAW command using command_long_encode()
+    msg = vehicle.message_factory.command_long_encode(
+        0, 0,  # target system, target component
+        mavutil.mavlink.MAV_CMD_CONDITION_YAW,  # command
+        0,  # confirmation
+        heading,  # param 1, yaw in degrees
+        0,  # param 2, yaw speed deg/s
+        1,  # param 3, direction -1 ccw, 1 cw
+        is_relative,  # param 4, relative offset 1, absolute angle 0
+        0, 0, 0)  # param 5 ~ 7 not used
+
+    # Send command to vehicle
+    vehicle.send_mavlink(msg)
+
+    # Hold the altitude by adjusting the target altitude
+    target_location = LocationGlobalRelative(
+        current_location.lat,
+        current_location.lon,
+        current_altitude
+    )
+    vehicle.simple_goto(target_location)
 
 
 # Function to connect to the drone
@@ -274,6 +309,14 @@ def return_tolaunch():
         time.sleep(1)
     print("RTL complete")
     response_data = {"message": "Returning to launch"}
+    return jsonify(response_data)
+
+@app.route("/yaw", methods=['POST'])
+def yaw_moment():
+    yaw = int(request.json.get('yaw'))
+    condition_yaw_at_current_location(yaw)
+    time.sleep(5)
+    response_data = {"message": "Done!"}
     return jsonify(response_data)
 
 if __name__ == '__main__':
