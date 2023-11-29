@@ -173,6 +173,8 @@ def handle_connect():
     global vehicle
     print(f'Client connected: {request.sid}')
     socketio.emit('parameters', {'data': altitude})
+    socketio.emit('yaw1_dis', {'data': yaw})
+
     # get_parameters()
     # socketio.emit('parameters', {'data': 0})
     # while vehicle is not None:
@@ -211,6 +213,14 @@ def condition_yaw_at_current_location(heading, relative=False):
         current_altitude
     )
     vehicle.simple_goto(target_location)
+
+    timeout=10
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        newyaw = vehicle.heading
+        print("yaw : ",newyaw)
+        socketio.emit('yaw1_dis',{'data': newyaw})
+        time.sleep(1)
 
 
 # Function to connect to the drone
@@ -279,7 +289,7 @@ def change_altitude(changealtitude):
             print(f"Reached new target altitude: {newaltitude}")
             socketio.emit('parameters', {'data': changealtitude})
             break
-        elif newaltitude <= (changealtitude ) and inc == False:
+        elif newaltitude <= (changealtitude + 0.5) and inc == False:
             print(f"Reached new target altitude: {newaltitude}")
             socketio.emit('parameters', {'data': changealtitude})
             break
@@ -358,6 +368,8 @@ def return_tolaunch():
 @app.route("/yaw", methods=['POST'])
 def yaw_moment():
     yaw = int(request.json.get('yaw'))
+    headingval=vehicle.heading
+    socketio.emit('yaw1_dis', {'data':headingval})
     condition_yaw_at_current_location(yaw)
     time.sleep(5)
     response_data = {"message": "Done!"}
