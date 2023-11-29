@@ -155,7 +155,9 @@ socketio = SocketIO(app)
 
 vehicle = None
 altitude = 0
-
+yaw = 0
+global cnt
+cnt = 0
 def get_parameters():
     global vehicle
     global altitude
@@ -220,6 +222,9 @@ def connect_to_drone():
     
     print('Connecting to vehicle on: %s' % args.connect)
     vehicle = dronekit_connect(args.connect)
+    # connection_string = 'COM4'
+    # vehicle = dronekit_connect(connection_string,baud=57600, wait_ready=True)
+
 
 # Function to arm and take off
 def arm_and_takeoff(aTargetAltitude):
@@ -252,6 +257,36 @@ def arm_and_takeoff(aTargetAltitude):
             break
         time.sleep(1)
 
+
+# Function to change altitude
+def change_altitude(changealtitude):
+    inc = False
+    curr = vehicle.location.global_relative_frame.alt
+    if curr <= changealtitude:
+        inc = True
+    print(f"Changing altitude to {changealtitude}")
+    vehicle.simple_goto(LocationGlobalRelative(
+        vehicle.location.global_relative_frame.lat,
+        vehicle.location.global_relative_frame.lon,
+        changealtitude,
+    ))
+
+    while True:
+        newaltitude = vehicle.location.global_relative_frame.alt
+        print("Altitude: ", newaltitude)
+        socketio.emit('parameters', {'data': newaltitude})
+        if newaltitude >= changealtitude * 0.95 and inc:
+            print(f"Reached new target altitude: {newaltitude}")
+            socketio.emit('parameters', {'data': changealtitude})
+            break
+        elif newaltitude <= (changealtitude ) and inc == False:
+            print(f"Reached new target altitude: {newaltitude}")
+            socketio.emit('parameters', {'data': changealtitude})
+            break
+        time.sleep(1)
+
+
+
 # Define the home route
 @app.route("/", methods=['GET'])
 def home():
@@ -267,17 +302,23 @@ def connect():
 # Define the route to take off
 @app.route("/takeoff", methods=['POST'])
 def take_off():
+    global cnt
     altitude = int(request.json.get('altitude'))
-    arm_and_takeoff(altitude)
-    print("Take off complete")
-    
+    if cnt==0:
+        cnt =1
+        arm_and_takeoff(altitude)
+        print("Take off complete")
+    else:
+        change_altitude(altitude)
     # Send the current altitude in the response
     response_data = {"message": f"Taking off to {altitude} meters", "altitude": altitude}
     return jsonify(response_data)
 
+
 # Define the route to land
 @app.route("/land", methods=['POST'])
 def landing():
+    global cnt
     print("Now let's land")
     vehicle.mode = VehicleMode("LAND")
     while True:
@@ -288,6 +329,7 @@ def landing():
             socketio.emit('parameters',{'data':0})
             break
         time.sleep(1)
+    cnt = 0
     response_data = {"message": "Now let's land"}
     vehicle.close()
     return jsonify(response_data)
@@ -296,6 +338,7 @@ def landing():
 @app.route("/RTL", methods=['POST'])
 def return_tolaunch():
     global vehicle
+    global cnt
     print("Returning to launch")
     vehicle.mode = VehicleMode("RTL")
 
@@ -307,6 +350,7 @@ def return_tolaunch():
             socketio.emit('parameters', {'data': 0})
             break
         time.sleep(1)
+    cnt = 0
     print("RTL complete")
     response_data = {"message": "Returning to launch"}
     return jsonify(response_data)

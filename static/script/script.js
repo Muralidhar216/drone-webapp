@@ -1,8 +1,11 @@
+$(document).ready(function() {
+    var heading1 = $.flightIndicator('#heading1', 'heading');
+    heading1.setHeading(180);
+})
 
 // script.js
 // const socket = io.connect("127.0.0.1:5000");
 const socket = io();
-
 socket.on('connect',function(){
     console.log(`connected with socket ID : ${socket.id}`);
 });
@@ -12,8 +15,13 @@ socket.on('connect',function(){
 // });
 socket.on('parameters', function(data) {
     console.log('Received altitude update:', data.data);
-    document.querySelector("#altitude1").innerHTML="Altitude : "+data.data;
+    document.querySelector("#altitude1_dis").innerHTML="Altitude : "+data.data+" m";
 });
+socket.on('yaw_data',function(data){
+    document.querySelector("#yaw_display").innerHTML="YAW : "+data.data;
+})
+
+
 
 function connect() {
     fetch('/drone_connect', {
@@ -77,15 +85,14 @@ function RTL() {
 
 
 function yaw(event) {
-    event.preventDefault();  // Prevent the form from submitting and page reload
-
+    event.preventDefault();
     const yaw = document.getElementById('yaw').value;
     console.log(yaw);
     fetch('/yaw', {
         method: 'POST',
         body: JSON.stringify({ yaw: yaw }),
         headers: {
-            'Content-Type': 'application/json', // Set the Content-Type header
+            'Content-Type': 'application/json',
         },
     })
     .then(response => response.json())
