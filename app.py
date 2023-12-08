@@ -12,7 +12,7 @@ from pymavlink import mavutil
 
 app = Flask(__name__)
 app.config['SECRET_KEY']="SapientGeeks"
-socketio = SocketIO(app,cors_allowed_origin="*")
+socketio = SocketIO(app,cors_allowed_origins="*")
 
 vehicle = None
 altitude = 0

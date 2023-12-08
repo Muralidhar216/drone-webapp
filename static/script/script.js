@@ -152,9 +152,9 @@ function speedtest() {
 
 
 
-const socketc = io("http://192.168.13.123:5001");
+const socketc = io("http://192.168.13.42:5001");
 socketc.on('connect',function(){
-    console.log(`connected with socket ID : ${socket.id}`);
+    console.log(`connected with socket ID : ${socketc.id}`);
 });
 
 $(document).ready(function() {
