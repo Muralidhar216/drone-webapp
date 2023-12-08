@@ -27,12 +27,12 @@
 
     <body>
         <header>
-            <h4 class = heading >DRONE WEB APPLICATION</h4>
+            <h4 class = heading >SKYALIGN NETWORK MANAGER</h4>
         </header>
         <!-- div Top Box -->
         <div class="top-box">
-            <div class = "drones">
-                <div class = "drone1">
+            <div class = "drones row">
+                <div class = "drone1 col-sm-1 col-md-2">
                     <h3 class="droneheading">MY DRONE</h3>
                     <div class="remote">
                         <div>
@@ -45,7 +45,7 @@
                         </div>
                     </div>
                 </div>
-                <div class = "drone2">
+                <div class = "drone2 col-sm-1 col-md-2">
                     <h3 class="droneheading">REMOTE DRONE</h3>
                     <div class="distant">
                         <div>
@@ -100,7 +100,7 @@
                     style="background-color: #55D164;margin:10px;"
                     ><p style = "color : #FFFFFF; font-weight : 700; font-size : 22px;">Download</p></div>
             </div>
-            <p id="ds" style="color:black">0</p>
+            <!--<p id="ds" style="color:black">0</p>-->
             <center><button type="button" class="btn btn-primary" style = "margin : 7px; font-weight :500;" onClick="speedtest()">Run Speed Test</button></center>
         </div>
 
@@ -134,6 +134,10 @@
                             <button class="btn btn-primary" type="submit" onClick="yaw(event)">Change Yaw</button>
                         </div>
                     </div>
+                </div>
+                <div class="mt-4">
+                    <button type="button" class="btn btn-warning"><a href="https://192.168.2.40" target="_blank" class="text-decoration-none text-dark ">Start Video Chat</a></button>
+                    
                 </div>
             </div>
             
