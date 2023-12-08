@@ -17,9 +17,6 @@ body{
     height:100%;
     width:98%;
 }
-.speedtest-inside{
-    margin:5px;
-}
 .drones{
     display:flex;
     justify-content: center;
@@ -38,13 +35,21 @@ body{
 .droneheading{
     text-align: center;
 }
+.speedtest{
+    display : flex;
+    justify-content: space-evenly;
+    
+}
+.speedtest_p{
+    border:3px solid #208CA2;
+}
 
 
 /* bottom left displays*/
 .bottom-box{
     margin:1%;
     display:flex;
-    justify-content: right;
+    justify-content: space-evenly;
 }
 label,input{
     display:block;
@@ -60,4 +65,52 @@ label,input{
 #takeoff_btn{
     margin:auto;
     padding:0%;
+}
+
+
+/* Gauge Meter*/
+.GaugeMeter {
+position: Relative;
+text-align: Center;
+overflow: Hidden;
+cursor: Default;
+}
+
+.GaugeMeter SPAN,
+.GaugeMeter B {
+margin: 0 23%;
+width: 54%;
+position: Absolute;
+text-align: Center;
+display: Inline-Block;
+color: RGBa(0, 0, 0, 0.8);
+font-weight: 100;
+font-family: 'Open Sans', Arial;
+overflow: Hidden;
+white-space: NoWrap;
+text-overflow: Ellipsis;
+}
+.GaugeMeter[data-style='Semi'] B {
+margin: 0 10%;
+width: 80%;
+}
+
+.GaugeMeter S,
+.GaugeMeter U {
+text-decoration: None;
+font-size: 0.6em;
+font-weight: 200;
+opacity: 0.6;
+}
+
+.GaugeMeter B {
+color: Black;
+font-weight: 200;
+font-size: 0.85em;
+opacity: 0.8;
+}
+
+
+DIV.GaugeMeter {
+float: Left;
 }

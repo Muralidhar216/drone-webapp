@@ -1,146 +1,7 @@
-# import argparse
-# import time
-
-# from dronekit import LocationGlobalRelative, VehicleMode
-# from dronekit import connect as dronekit_connect
-# from flask import Flask, jsonify, render_template, request
-# from flask_socketio import SocketIO, emit
-
-# app = Flask(__name__)
-# app.config['SECRET_KEY']="SapientGeeks"
-# socketio = SocketIO(app)
-
-# vehicle = None
-# altitude = 0
-
-# def get_parameters():
-#     global vehicle
-#     global altitude
-#     while(1):
-#         socketio.emit('parameters', {'data': altitude})
-    
-
-# def send_message():
-#     socketio.emit('server_message', {'data': 'Hello from Flask!'}, room=request.sid)
-
-# @socketio.on('connect')
-# def handle_connect():
-#     global vehicle
-#     print(f'Client connected: {request.sid}')
-#     socketio.emit('parameters', {'data': altitude})
-#     # get_parameters()
-#     # socketio.emit('parameters', {'data': 0})
-#     # while vehicle is not None:
-#     # get_parameters()
-
-
-# # Function to connect to the drone
-# def connect_to_drone():
-#     global vehicle
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('--connect', default='127.0.0.1:14550')
-#     args = parser.parse_args()
-    
-#     print('Connecting to vehicle on: %s' % args.connect)
-#     vehicle = dronekit_connect(args.connect)
-
-# # Function to arm and take off
-# def arm_and_takeoff(aTargetAltitude):
-#     global vehicle
-#     print("Basic pre-arm checks")
-    
-#     while not vehicle.is_armable:
-#         print("Waiting for vehicle to initialise...")
-#         time.sleep(1)
-    
-#     print("Arming motors")
-#     vehicle.mode = VehicleMode("GUIDED")
-#     vehicle.armed = True
-    
-#     while not vehicle.armed:
-#         print("Waiting for arming...")
-#         time.sleep(1)
-    
-#     print("Taking off!")
-#     vehicle.simple_takeoff(aTargetAltitude)
-    
-#     while True:
-#         altitude = vehicle.location.global_relative_frame.alt
-#         # print("Altitude: ", vehicle.location.global_relative_frame.alt)
-#         print("Altitude: ", altitude)
-#         socketio.emit('parameters', {'data': altitude})
-#         if vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95:
-#             print("Reached target altitude")
-#             socketio.emit('parameters',{'data':aTargetAltitude})
-#             break
-#         time.sleep(1)
-
-# # Define the home route
-# @app.route("/", methods=['GET'])
-# def home():
-#     return render_template('index.html')
-
-# # Define the route to connect to the drone
-# @app.route("/drone_connect", methods=['POST'])
-# def connect():
-#     connect_to_drone()
-#     response_data = {"message": "Drone connected"}
-#     return jsonify(response_data)
-
-# # Define the route to take off
-# @app.route("/takeoff", methods=['POST'])
-# def take_off():
-#     altitude = int(request.json.get('altitude'))
-#     arm_and_takeoff(altitude)
-#     print("Take off complete")
-    
-#     # Send the current altitude in the response
-#     response_data = {"message": f"Taking off to {altitude} meters", "altitude": altitude}
-#     return jsonify(response_data)
-
-# # Define the route to land
-# @app.route("/land", methods=['POST'])
-# def landing():
-#     print("Now let's land")
-#     vehicle.mode = VehicleMode("LAND")
-#     while True:
-#         altitude = vehicle.location.global_relative_frame.alt
-#         print("Altitude: ", altitude)
-#         socketio.emit('parameters', {'data': altitude})
-#         if altitude < 0.5*0.95:
-#             socketio.emit('parameters',{'data':0})
-#             break
-#         time.sleep(1)
-#     response_data = {"message": "Now let's land"}
-#     vehicle.close()
-#     return jsonify(response_data)
-
-
-# @app.route("/RTL", methods=['POST'])
-# def return_tolaunch():
-#     # print("Now let's land")
-#     vehicle.mode = VehicleMode("RTL")
-#     while True:
-#         altitude = vehicle.location.global_relative_frame.alt
-#         print("Altitude: ", altitude)
-#         socketio.emit('parameters', {'data': altitude})
-#         if vehicle.location.global_relative_frame.alt < 0.5*0.95:
-#             socketio.emit('parameters',{'data':0})
-#             break
-#         time.sleep(1)
-#     response_data = {"Return to Launch"}
-#     vehicle.close()
-#     return jsonify(response_data)
-
-# if __name__ == '__main__':
-#     socketio.run(app, debug=True)
-
-
-
-
-
-
 import argparse
+import os
+import socket
+import sys
 import time
 
 from dronekit import LocationGlobalRelative, VehicleMode
@@ -151,7 +12,7 @@ from pymavlink import mavutil
 
 app = Flask(__name__)
 app.config['SECRET_KEY']="SapientGeeks"
-socketio = SocketIO(app)
+socketio = SocketIO(app,cors_allowed_origin="*")
 
 vehicle = None
 altitude = 0
@@ -296,6 +157,86 @@ def change_altitude(changealtitude):
         time.sleep(1)
 
 
+def start_client():
+    s = socket.socket()
+    host = socket.gethostname()
+    port = 5000
+    print(host)
+
+    # Set the file size to 100 MB for download and upload
+    file_size = 100 * 1024 * 1024  # 100 MB
+
+    t1 = time.time()
+
+    try:
+        s.connect((host, port))
+        s.send("Hello server!".encode())
+
+        # Receive a message to indicate the start of download measurement
+        s.recv(1024)
+
+        # Receive the file size from the server
+        downloaded_file_size = int(s.recv(1024).decode())
+        print('Received File Size:', downloaded_file_size)
+
+        s.send("start_upload".encode())  # Send acknowledgment to start upload
+
+        with open('received_file.txt', 'wb') as f:
+            received_size = 0
+            while received_size < downloaded_file_size:
+                data = s.recv(1024)
+                f.write(data)
+                received_size += len(data)
+
+        t2 = time.time()
+
+        throughput_kbps = (downloaded_file_size / 1024) / (t2 - t1)
+        throughput_mbps = throughput_kbps / 1000
+        print('Download Throughput:', round(throughput_mbps, 3), 'Mbps')
+
+        # Send a confirmation to the server
+        s.send("Download complete".encode())
+        sys.stdout.flush()  # Flush the output buffer
+
+        # Receive a message to indicate the start of upload measurement
+        s.recv(1024)
+
+        # Send the file to the server
+        s.sendall(str(file_size).encode())  # Send the file size to the server
+        ack = s.recv(1024)  # Wait for server acknowledgment
+
+        if ack.decode() == 'start_upload':
+            with open('upload.txt', 'rb') as f:
+                while True:
+                    l = f.read(1024)
+                    if not l:
+                        break
+                    s.sendall(l)
+
+        print('Done sending upload')
+        sys.stdout.flush()  # Flush the output buffer
+        s.recv(1024)  # Wait for the server confirmation
+
+        t3 = time.time()
+
+        upload_throughput_kbps = (file_size / 1024) / (t3 - t2)
+        upload_throughput_mbps = upload_throughput_kbps / 1000
+        print('Upload Throughput:', round(upload_throughput_mbps, 3), 'Mbps')
+
+    except Exception as e:
+        print('Error:', str(e))
+
+    finally:
+        if s.fileno() != -1:  # Check if the socket is valid
+            s.close()
+            print('Connection closed')
+    return [round(throughput_mbps, 3),round(upload_throughput_mbps, 3)]
+
+
+
+
+
+
 
 # Define the home route
 @app.route("/", methods=['GET'])
@@ -375,5 +316,17 @@ def yaw_moment():
     response_data = {"message": "Done!"}
     return jsonify(response_data)
 
+
+@app.route("/networkspeed", methods=['POST'])
+def network_speedtest():
+    speeds = start_client()
+    download_speed, upload_speed = speeds
+    response_data = {
+        "download_speed": download_speed,
+        "upload_speed": upload_speed
+    }
+    return jsonify(response_data)
+
+
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True,host="192.168.13.123",port=5000)

@@ -1,6 +1,6 @@
 // script.js
 // const socket = io.connect("127.0.0.1:5000");
-const socket = io();
+const socket = io("http://192.168.13.123:5000");
 socket.on('connect',function(){
     console.log(`connected with socket ID : ${socket.id}`);
 });
@@ -128,3 +128,55 @@ function yaw(event) {
         console.error('Error:', error);
     });
 }
+
+function speedtest() {
+    fetch('/networkspeed', {
+        method: 'POST',
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        const downloadSpeed = data.download_speed;
+        console.log(Math.floor(downloadSpeed));
+
+        // Update the data-percent attribute for a specific element with the ID 'PreviewGaugeMeter_1'
+        const gaugeElement = document.getElementById('ds').innerHTML=Math.floor(downloadSpeed);
+        gaugeElement.setAttribute('data-percent', (Math.floor(downloadSpeed)).toString());
+        gaugeElement.load()
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
+
+
+const socketc = io("http://192.168.13.123:5001");
+socketc.on('connect',function(){
+    console.log(`connected with socket ID : ${socket.id}`);
+});
+
+$(document).ready(function() {
+    var altimeter2 = $.flightIndicator('#altimeter2', 'altimeter');
+    altimeter2.setAltitude(0);
+    socketc.on('parameters', function(data) {
+        console.log('Received altitude update:', data.data);
+        const altitudeInFeet = data.data * 3.28084;
+        altimeter2.setAltitude(altitudeInFeet);
+        document.querySelector("#altitude2_dis").innerHTML="Altitude : "+data.data+" m";
+    });
+    
+})
+
+
+$(document).ready(function() {
+    var heading2 = $.flightIndicator('#heading2', 'heading');
+    heading2.setHeading(0);
+    socketc.on('yaw1_dis', function(data) {
+        heading2.setHeading(data.data);
+        document.querySelector("#heading2_dis").innerHTML="YAW : "+data.data;
+    });
+    
+})
+

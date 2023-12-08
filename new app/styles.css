@@ -44,7 +44,7 @@ body{
 .bottom-box{
     margin:1%;
     display:flex;
-    justify-content: right;
+    justify-content: space-evenly;
 }
 label,input{
     display:block;
@@ -59,4 +59,8 @@ label,input{
 #takeoff_btn{
     margin:auto;
     padding:0%;
+}
+.speedtest{
+    display:flexbox;
+    justify-content: space-evenly;
 }
