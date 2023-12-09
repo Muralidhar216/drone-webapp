@@ -1,10 +1,11 @@
 // script.js
-// const socket = io.connect("127.0.0.1:5000");
-const socket = io("http://192.168.13.123:5000");
+const socket = io();
+// const socket = io("http://192.168.13.123:5000");
 socket.on('connect',function(){
     console.log(`connected with socket ID : ${socket.id}`);
 });
-
+// var uploadspeed = 0
+// var downloadspeed =0
 // socket.on('server_message', function (data) {
 //     console.log('Received data from Flask:', data.data);
 //     document.querySelector("#altitude1").innerHTML = "" + data.data;
@@ -54,7 +55,8 @@ function connect() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        console.log(data.message)
+        //document.querySelector("#connection").innerHTML=data.message;
     })
     .catch(error => {
         console.error('Error:', error);
@@ -136,13 +138,37 @@ function speedtest() {
     .then(response => response.json())
     .then(data => {
         console.log(data);
-        const downloadSpeed = data.download_speed;
-        console.log(Math.floor(downloadSpeed));
+        
+        const downloadspeed = Math.floor(data.download_speed);
+        document.querySelector("#Downloadspeed").innerHTML="Download Speed : "+downloadspeed;
+        console.log(downloadspeed);
+        const uploadspeed = Math.floor(data.upload_speed);
+        document.querySelector("#Uploadspeed").innerHTML="Upload Speed : "+uploadspeed;
+        console.log(uploadspeed);
 
-        // Update the data-percent attribute for a specific element with the ID 'PreviewGaugeMeter_1'
-        const gaugeElement = document.getElementById('ds').innerHTML=Math.floor(downloadSpeed);
-        gaugeElement.setAttribute('data-percent', (Math.floor(downloadSpeed)).toString());
-        gaugeElement.load()
+
+        $(document).ready(function() {
+            $("#demo1").gauge(uploadspeed, {
+                min: 0,
+                max: 100,
+                unit: " Mpbs",
+                color: "red",
+                colorAlpha: 1,
+                bgcolor: "#222",
+                type: "default"
+            });
+        
+            $("#demo2").gauge(downloadspeed, {
+                min: 0,
+                max: 100,
+                unit: " Mpbs",
+                color: "green",
+                colorAlpha: 1,
+                bgcolor: "#222",
+                type: "default"
+            });
+        });
+
     })
     .catch(error => {
         console.error('Error:', error);
@@ -179,4 +205,33 @@ $(document).ready(function() {
     });
     
 })
+
+
+
+
+
+$(document).ready(function() {
+    $("#demo1").gauge(0, {
+        min: 0,
+        max: 100,
+        unit: " Mpbs",
+        color: "red",
+        colorAlpha: 1,
+        bgcolor: "#222",
+        type: "default"
+    });
+
+    $("#demo2").gauge(0, {
+        min: 0,
+        max: 100,
+        unit: " Mpbs",
+        color: "green",
+        colorAlpha: 1,
+        bgcolor: "#222",
+        type: "default"
+    });
+});
+
+
+
 
