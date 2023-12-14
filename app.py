@@ -49,10 +49,6 @@ def condition_yaw_at_current_location(heading, relative=False):
     else:
         is_relative = 0  # yaw is an absolute angle
 
-    # Get current position to maintain the same altitude
-    current_location = vehicle.location.global_relative_frame
-    current_altitude = current_location.alt
-
     # create the CONDITION_YAW command using command_long_encode()
     msg = vehicle.message_factory.command_long_encode(
         0, 0,  # target system, target component
@@ -66,14 +62,6 @@ def condition_yaw_at_current_location(heading, relative=False):
 
     # Send command to vehicle
     vehicle.send_mavlink(msg)
-
-    # Hold the altitude by adjusting the target altitude
-    target_location = LocationGlobalRelative(
-        current_location.lat,
-        current_location.lon,
-        current_altitude
-    )
-    vehicle.simple_goto(target_location)
 
     timeout=10
     start_time = time.time()
@@ -127,6 +115,16 @@ def arm_and_takeoff(aTargetAltitude):
             socketio.emit('parameters',{'data':aTargetAltitude})
             break
         time.sleep(1)
+
+    current_location = vehicle.location.global_relative_frame
+    current_altitude = current_location.alt
+    # Hold the altitude by adjusting the target altitude
+    target_location = LocationGlobalRelative(
+        current_location.lat,
+        current_location.lon,
+        current_altitude
+    )
+    vehicle.simple_goto(target_location)
 
 
 # Function to change altitude
@@ -329,5 +327,5 @@ def network_speedtest():
 
 
 if __name__ == '__main__':
-    # socketio.run(app, debug=True,host="192.168.13.123",port=5000)
-    socketio.run(app, debug=True)
+    # socketio.run(app, debug=True,host="172.168.3.130",port=5000)
+    socketio.run(app, debug=True,host='0.0.0.0', port=5000)
