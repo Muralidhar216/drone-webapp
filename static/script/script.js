@@ -4,8 +4,7 @@ const socket = io();
 socket.on('connect',function(){
     console.log(`connected with socket ID : ${socket.id}`);
 });
-// var uploadspeed = 0
-// var downloadspeed =0
+
 // socket.on('server_message', function (data) {
 //     console.log('Received data from Flask:', data.data);
 //     document.querySelector("#altitude1").innerHTML = "" + data.data;
@@ -56,7 +55,7 @@ function connect() {
     .then(response => response.json())
     .then(data => {
         console.log(data.message)
-        //document.querySelector("#connection").innerHTML=data.message;
+        document.querySelector("#connection").innerHTML=data.message+" ✅";
     })
     .catch(error => {
         console.error('Error:', error);
@@ -192,7 +191,6 @@ $(document).ready(function() {
         altimeter2.setAltitude(altitudeInFeet);
         document.querySelector("#altitude2_dis").innerHTML="Altitude : "+data.data+" m";
     });
-    
 })
 
 
@@ -232,6 +230,60 @@ $(document).ready(function() {
     });
 });
 
+window.onload = function () {
+    var alphaalt = 0;
+    var betaalt = 0;
+
+    var options = {
+        animationEnabled: true,
+        title: {
+            text: "Radio Path Study"
+        },
+        axisX: {
+            minimum: 0, // Set minimum value to 0 for x-axis
+            labelFormatter: function (e) {
+                return e.value === 2 ? 'alpha' : (e.value === 10 ? 'beta' : '');
+            }
+        },
+        axisY: {
+            title: "Elevation (meters)",
+            minimum: 0, // Set minimum value to 0 for y-axis
+        },
+
+        data: [{
+            type: "area",
+            markerSize: 5,
+            xValueFormatString: "#,##0.## meters",
+            yValueFormatString: "#,##0.## meters",
+            dataPoints: [
+                { x: 2, y: 0 }, // Initialize the first y-coordinate to 0
+                { x: 10, y: 0 } // Initialize the second y-coordinate to 0
+            ]
+        }]
+    };
+
+    var chart = new CanvasJS.Chart("chartContainer", options);
+    chart.render(); // Initial rendering
+
+    socket.on('parameters', function (data) {
+        console.log('Received altitude update:', data.data);
+        alphaalt = data.data;
+
+        // Update y-values dynamically
+        options.data[0].dataPoints[0].y = alphaalt;
+
+        chart.render(); // Render the updated chart
+    });
 
 
+    socketc.on('parameters', function (data) {
+        console.log('Received altitude update from socketc:', data.data);
+        betaalt = data.data;
 
+        // Update y-values dynamically
+        options.data[0].dataPoints[1].y = betaalt;
+
+        chart.render(); // Render the updated chart
+    });
+    
+}

@@ -11,7 +11,6 @@ from flask_socketio import SocketIO, emit
 from pymavlink import mavutil
 
 app = Flask(__name__)
-app.config['SECRET_KEY']="SapientGeeks"
 socketio = SocketIO(app,cors_allowed_origins="*")
 
 vehicle = None
@@ -19,15 +18,15 @@ altitude = 0
 yaw = 0
 global cnt
 cnt = 0
-def get_parameters():
-    global vehicle
-    global altitude
-    while(1):
-        socketio.emit('parameters', {'data': altitude})
+# def get_parameters():
+#     global vehicle
+#     global altitude
+#     while(1):
+#         socketio.emit('parameters', {'data': altitude})
     
 
-def send_message():
-    socketio.emit('server_message', {'data': 'Hello from Flask!'}, room=request.sid)
+# def send_message():
+#     socketio.emit('server_message', {'data': 'Hello from Flask!'}, room=request.sid)
 
 @socketio.on('connect')
 def handle_connect():
@@ -76,12 +75,15 @@ def condition_yaw_at_current_location(heading, relative=False):
 def connect_to_drone():
     global vehicle
     parser = argparse.ArgumentParser()
-    parser.add_argument('--connect', default='127.0.0.1:14550')
+    # parser.add_argument('--connect', default='127.0.0.1:14550')
+    parser.add_argument('--connect', default='udp:192.168.2.106:14553')
     args = parser.parse_args()
     
     print('Connecting to vehicle on: %s' % args.connect)
+    # vehicle = dronekit_connect(args.connect)
     vehicle = dronekit_connect(args.connect)
-    # connection_string = 'COM4'
+    print(vehicle)
+    # connection_string = 'COM5'
     # vehicle = dronekit_connect(connection_string,baud=57600, wait_ready=True)
 
 
@@ -162,7 +164,7 @@ def start_client():
     print(host)
 
     # Set the file size to 100 MB for download and upload
-    file_size = 100 * 1024 * 1024  # 100 MB
+    file_size = 10 * 1024 * 1024  # 100 MB
 
     t1 = time.time()
 

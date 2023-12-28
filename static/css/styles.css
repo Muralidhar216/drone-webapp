@@ -1,6 +1,7 @@
 body{
     background-color: #304E5B;
     margin:0px;
+    padding: 0px;
 }
 .heading{
     text-align: center;
@@ -52,6 +53,7 @@ body{
     margin:1%;
     display:flex;
     justify-content: space-evenly;
+    width:64%;
 }
 label,input{
     display:block;

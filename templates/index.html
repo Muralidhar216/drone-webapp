@@ -22,12 +22,14 @@
     <script type='text/javascript' src="{{url_for('static',filename='script/script.js')}}"></script>
     <script type='text/javascript' src="{{url_for('static',filename='script/jquery.gauge.js')}}"></script>
 
+    <!-- graph -->
+    <script type='text/javascript' src="{{url_for('static',filename='script/jquery.canvasjs.min.js')}}"></script>
     </head>
 
 
     <body>
         <header>
-            <h4 class = heading >SKYALIGN NETWORK MANAGER</h4>
+            <h4 class = heading >AERO LINK 🛩️</h4>
         </header>
         <!-- div Top Box -->
         <div class="top-box">
@@ -77,12 +79,13 @@
                 </div>
             </div>
             <center><button type="button" class="btn btn-primary" style = "margin : 7px; font-weight :500;" onClick="speedtest()">Run Speed Test</button></center>
-        </div>
+            </div>
 
             <div class="drone-controls">
-                <h4 style="color:#000000; text-align:center; font-weight:500" class="mt-0 mb-1">ALPHA CONTROLS</h4><hr class="mt-2 mb-4">
+                <h4 style="color:#000000; text-align:center; font-weight:500" class="mt-0 mb-1">ALPHA CONTROLS 🕹️</h4><hr class="mt-2 mb-4">
                 <div class="start-button">
                     <button type="button" class="btn btn-outline-success" onClick="connect()">Connect</button>
+                    <p id="connection"style="color:#50C878;margin-bottom:0px;margin-top:2px"></p>
                 </div><br>
                 <form class="row g-3 align-items-center" action="" method="post" name='drone_sim'>
                     <div class="col-auto m-0" id="takeoff_form">
@@ -113,11 +116,14 @@
                 </div>
                 <div class="mt-4">
                     <button type="button" class="btn btn-warning"><a href="https://192.168.2.40:3000" target="_blank" class="text-decoration-none text-dark ">Start Video Chat</a></button>
-                    
+
                 </div>
             </div>
+
+            <div>
+                <div id="chartContainer" style="height: 400px; width: 100%;"></div>
+            </div>
         </div>
-        
     </body>
 </html>
 
