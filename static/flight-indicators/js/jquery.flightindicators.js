@@ -356,7 +356,7 @@
         // Initial configuration
         var attitude = this;
         var settings = $.extend({
-            size: 200,
+            size: 250,
             roll: 0,
             pitch: 0,
             turn: 0,

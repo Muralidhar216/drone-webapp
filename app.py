@@ -75,16 +75,18 @@ def condition_yaw_at_current_location(heading, relative=False):
 def connect_to_drone():
     global vehicle
     parser = argparse.ArgumentParser()
-    # parser.add_argument('--connect', default='127.0.0.1:14550')
-    parser.add_argument('--connect', default='udp:192.168.2.106:14553')
+    parser.add_argument('--connect', default='127.0.0.1:14550')
+    # parser.add_argument('--connect', default='udp:192.168.2.106:14553')
     args = parser.parse_args()
     
     print('Connecting to vehicle on: %s' % args.connect)
     # vehicle = dronekit_connect(args.connect)
     vehicle = dronekit_connect(args.connect)
     print(vehicle)
+    socketio.emit('yaw1_dis',{'data': vehicle.heading})
     # connection_string = 'COM5'
     # vehicle = dronekit_connect(connection_string,baud=57600, wait_ready=True)
+
 
 
 # Function to arm and take off
@@ -160,11 +162,13 @@ def change_altitude(changealtitude):
 def start_client():
     s = socket.socket()
     host = socket.gethostname()
-    port = 5000
+    port = 2023
     print(host)
 
-    # Set the file size to 100 MB for download and upload
-    file_size = 10 * 1024 * 1024  # 100 MB
+    # Set the file size to 10 MB for download and upload
+    # file_size = 10 * 1024 * 1024  # 10 MB
+    file_size =os.path.getsize('upload.txt')
+    
 
     t1 = time.time()
 
@@ -326,6 +330,14 @@ def network_speedtest():
         "upload_speed": upload_speed
     }
     return jsonify(response_data)
+
+@app.route("/satellites", methods=['POST'])
+def getsats():
+    global vehicle
+    if vehicle:
+        num_sats = vehicle.gps_0.satellites_visible
+        return jsonify(num_sats=num_sats)
+    return jsonify(num_sats="No Connection")
 
 
 if __name__ == '__main__':

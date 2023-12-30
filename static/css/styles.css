@@ -3,13 +3,25 @@ body{
     margin:0px;
     padding: 0px;
 }
-.heading{
+
+.areolink_title{
+    display: inline;
     text-align: center;
     font-weight: 900;
     color:#F7FAFA;
     font-family: Arial, Helvetica, sans-serif;
     letter-spacing: normal;
-    margin-top: 8px;
+    margin-top: 7px;
+    margin-left: 45%;
+}
+.header-container{
+    display:flex;
+    align-items:center;
+    
+}
+.sats{
+    display:flex;
+    margin-left: 25%;
 }
 
 .top-box{

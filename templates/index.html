@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Drone Application</title>
+        <title>Aerolink</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
@@ -28,14 +28,19 @@
 
 
     <body>
-        <header>
-            <h4 class = heading >AERO LINK 🛩️</h4>
+        <header class="header-container">
+            <h4 class ="areolink_title" >AERO LINK 🛩️</h4>
+            <div class="sats">
+                <button type="button" class="btn btn-sm" style="padding:0px; border:0px;margin:5px" onclick="sats_cnt()">🔄</button>
+                <p class="sats_num" style="margin-top:5px; margin-bottom:5px; color:white">sats: 0</p>
+            </div>
         </header>
+        
         <!-- div Top Box -->
         <div class="top-box">
             <div class = "drones row">
                 <div class = "drone1 col-sm-1 col-md-2">
-                    <h3 class="droneheading">DRONE ALPHA</h3>
+                    <h4 class="droneheading">DRONE ALPHA</h4>
                     <div class="remote">
                         <div>
                             <span id="altimeter1"></span>
@@ -48,7 +53,7 @@
                     </div>
                 </div>
                 <div class = "drone2 col-sm-1 col-md-2">
-                    <h3 class="droneheading">DRONE BETA</h3>
+                    <h4 class="droneheading">DRONE BETA</h4>
                     <div class="distant">
                         <div>
                             <span id="altimeter2"></span>

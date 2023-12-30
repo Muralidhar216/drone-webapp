@@ -109,6 +109,20 @@ function RTL() {
     });
 }
 
+function sats_cnt() {
+    fetch('/satellites', {
+        method: 'POST',
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        document.querySelector(".sats_num").innerHTML="sats: "+data.num_sats;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
 
 function yaw(event) {
     event.preventDefault();
@@ -139,11 +153,11 @@ function speedtest() {
         console.log(data);
         
         const downloadspeed = Math.floor(data.download_speed);
-        document.querySelector("#Downloadspeed").innerHTML="Download Speed : "+downloadspeed;
-        console.log(downloadspeed);
+        document.querySelector("#Downloadspeed").innerHTML="Download Speed : "+data.download_speed;
+        console.log(data.download_speed);
         const uploadspeed = Math.floor(data.upload_speed);
-        document.querySelector("#Uploadspeed").innerHTML="Upload Speed : "+uploadspeed;
-        console.log(uploadspeed);
+        document.querySelector("#Uploadspeed").innerHTML="Upload Speed : "+data.upload_speed;
+        console.log(data.upload_speed);
 
 
         $(document).ready(function() {
@@ -237,7 +251,7 @@ window.onload = function () {
     var options = {
         animationEnabled: true,
         title: {
-            text: "Radio Path Study"
+            text: "Flight Altitudes"
         },
         axisX: {
             minimum: 0, // Set minimum value to 0 for x-axis
