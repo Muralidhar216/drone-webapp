@@ -1,6 +1,6 @@
 // script.js
 const socket = io();
-// const socket = io("http://192.168.13.123:5000");
+// const socket = io("http://172.168.3.61:5000");
 socket.on('connect',function(){
     console.log(`connected with socket ID : ${socket.id}`);
 });
@@ -144,6 +144,29 @@ function yaw(event) {
     });
 }
 
+
+function drone_goto(event) {
+    event.preventDefault();
+    const lat = document.getElementById('latitude').value;
+    const long = document.getElementById("longitude").value;
+    console.log("latitude: "+lat);
+    console.log("longitude: "+long);
+    fetch('/dgoto', {
+        method: 'POST',
+        body: JSON.stringify({ latitude: lat, longitude:long }),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
 function speedtest() {
     fetch('/networkspeed', {
         method: 'POST',
@@ -191,7 +214,7 @@ function speedtest() {
 
 
 
-const socketc = io("http://192.168.13.42:5001");
+const socketc = io("http://192.168.2.102:5001");
 socketc.on('connect',function(){
     console.log(`connected with socket ID : ${socketc.id}`);
 });

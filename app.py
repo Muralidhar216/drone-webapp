@@ -75,18 +75,18 @@ def condition_yaw_at_current_location(heading, relative=False):
 def connect_to_drone():
     global vehicle
     parser = argparse.ArgumentParser()
-    parser.add_argument('--connect', default='127.0.0.1:14550')
-    # parser.add_argument('--connect', default='udp:192.168.2.106:14553')
+    # parser.add_argument('--connect', default='127.0.0.1:14550')
+    parser.add_argument('--connect', default='udp:192.168.2.101:14553')
     args = parser.parse_args()
     
     print('Connecting to vehicle on: %s' % args.connect)
     # vehicle = dronekit_connect(args.connect)
     vehicle = dronekit_connect(args.connect)
     print(vehicle)
-    socketio.emit('yaw1_dis',{'data': vehicle.heading})
     # connection_string = 'COM5'
     # vehicle = dronekit_connect(connection_string,baud=57600, wait_ready=True)
-
+    socketio.emit('yaw1_dis',{'data': vehicle.heading})
+    
 
 
 # Function to arm and take off
@@ -161,12 +161,11 @@ def change_altitude(changealtitude):
 
 def start_client():
     s = socket.socket()
-    host = socket.gethostname()
+    # host = socket.gethostname()
+    host = "192.168.2.102"
     port = 2023
     print(host)
 
-    # Set the file size to 10 MB for download and upload
-    # file_size = 10 * 1024 * 1024  # 10 MB
     file_size =os.path.getsize('upload.txt')
     
 
@@ -319,6 +318,21 @@ def yaw_moment():
     time.sleep(5)
     response_data = {"message": "Done!"}
     return jsonify(response_data)
+
+
+# Define the route to goto location
+@app.route("/dgoto", methods=['POST'])
+def goto_pos():
+    lat = float(request.json.get('latitude'))
+    long = float(request.json.get('longitude'))
+    current_location = vehicle.location.global_relative_frame
+    current_altitude = current_location.alt
+    target_location = LocationGlobalRelative(
+        lat,long,current_altitude
+    )
+    vehicle.simple_goto(target_location)
+    return jsonify("message:goto done!")
+    
 
 
 @app.route("/networkspeed", methods=['POST'])

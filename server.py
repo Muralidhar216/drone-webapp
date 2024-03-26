@@ -4,9 +4,10 @@ import time
 
 
 def start_server():
-    port = 2023
+    port = 2024
     s = socket.socket()
-    host = socket.gethostname()
+    # host = socket.gethostname()
+    host = "192.168.2.101"
     print(host)
     s.bind((host, port))
     s.listen(5)
